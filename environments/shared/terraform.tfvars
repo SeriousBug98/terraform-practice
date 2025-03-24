@@ -1,3 +1,4 @@
+# VPC
 name        = "shared-vpc"
 cidr_block  = "10.0.0.0/16"
 azs         = ["ap-northeast-2a"]
@@ -15,6 +16,7 @@ subnets = [
   { az = "ap-northeast-2a", cidr = "10.0.1.0/24", type = "public" }
 ]
 
+# SG
 security_groups = [
   { name = "bastion-sg",        description = "Allow SSH from Developer" }
 ]
@@ -30,3 +32,6 @@ security_group_rules = [
     cidr_blocks           = ["211.244.225.164/32"]
   }
 ]
+
+# EC2
+key_name = "KTB-personal-project-keypair"

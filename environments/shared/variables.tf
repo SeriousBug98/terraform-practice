@@ -48,3 +48,8 @@ variable "security_groups" {
 variable "security_group_rules" {
   type = any
 }
+
+# EC2 variables
+variable "key_name" {
+  type = string
+}

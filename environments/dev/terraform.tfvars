@@ -1,3 +1,4 @@
+# VPC
 name        = "dev-vpc"
 cidr_block  = "10.1.0.0/16"
 azs         = ["ap-northeast-2a", "ap-northeast-2c"]
@@ -22,6 +23,7 @@ subnets = [
   { az = "ap-northeast-2c", cidr = "10.1.8.0/24", type = "db" }
 ]
 
+# SG
 security_groups = [
   { name = "alb-sg",        description = "Allow HTTP/HTTPS from anywhere" },
   { name = "web-sg",        description = "Allow traffic from ALB" },
@@ -95,3 +97,6 @@ security_group_rules = [
     source_sg_name        = "app-sg"
   }
 ]
+
+# EC2
+key_name = "KTB-personal-project-keypair"
