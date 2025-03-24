@@ -21,3 +21,77 @@ subnets = [
   { az = "ap-northeast-2a", cidr = "10.1.7.0/24", type = "db" },
   { az = "ap-northeast-2c", cidr = "10.1.8.0/24", type = "db" }
 ]
+
+security_groups = [
+  { name = "alb-sg",        description = "Allow HTTP/HTTPS from anywhere" },
+  { name = "web-sg",        description = "Allow traffic from ALB" },
+  { name = "alb-app-sg",    description = "Internal ALB for app layer" },
+  { name = "app-sg",        description = "Allow traffic from app alb" },
+  { name = "db-sg",         description = "Allow traffic from app" }
+]
+
+security_group_rules = [
+  # ALB ingress from public
+  {
+    name                  = "alb-https"
+    type                  = "ingress"
+    from_port             = 443
+    to_port               = 443
+    protocol              = "tcp"
+    security_group_name   = "alb-sg"
+    cidr_blocks           = ["0.0.0.0/0"]
+  },
+  {
+    name                  = "alb-http"
+    type                  = "ingress"
+    from_port             = 80
+    to_port               = 80
+    protocol              = "tcp"
+    security_group_name   = "alb-sg"
+    cidr_blocks           = ["0.0.0.0/0"]
+  },
+
+  # web from alb
+  {
+    name                  = "web-from-alb"
+    type                  = "ingress"
+    from_port             = 80
+    to_port               = 80
+    protocol              = "tcp"
+    security_group_name   = "web-sg"
+    source_sg_name        = "alb-sg"
+  },
+
+  # alb-app from web
+  {
+    name                  = "alb-app-from-web"
+    type                  = "ingress"
+    from_port             = 8080
+    to_port               = 8080
+    protocol              = "tcp"
+    security_group_name   = "alb-app-sg"
+    source_sg_name        = "web-sg"
+  },
+
+  # app from alb-app
+  {
+    name                  = "app-from-alb-app"
+    type                  = "ingress"
+    from_port             = 8080
+    to_port               = 8080
+    protocol              = "tcp"
+    security_group_name   = "app-sg"
+    source_sg_name        = "alb-app-sg"
+  },
+
+  # db from app
+  {
+    name                  = "db-from-app"
+    type                  = "ingress"
+    from_port             = 3306
+    to_port               = 3306
+    protocol              = "tcp"
+    security_group_name   = "db-sg"
+    source_sg_name        = "app-sg"
+  }
+]
