@@ -1,3 +1,9 @@
+# 공통 variables
+variable "tags" {
+  type = map(string)
+}
+
+# VPC variables
 variable "name" {
   type = string
 }
@@ -8,10 +14,6 @@ variable "cidr_block" {
 
 variable "azs" {
   type = list(string)
-}
-
-variable "tags" {
-  type = map(string)
 }
 
 variable "create_igw" {
@@ -32,4 +34,17 @@ variable "subnets" {
     cidr = string
     type = string
   }))
+}
+
+# SG variables
+variable "vpc_id" {
+  type = string
+}
+
+variable "security_groups" {
+  type = any
+}
+
+variable "security_group_rules" {
+  type = any
 }
