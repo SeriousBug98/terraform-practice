@@ -4,6 +4,6 @@ resource "aws_instance" "this" {
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [var.security_group_id]
   key_name               = var.key_name
-
-  tags = merge(var.tags, { Name = var.name })
+  
+  tags = merge(var.tags, { Name = var.ec2_name })
 }

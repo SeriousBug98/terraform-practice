@@ -16,6 +16,21 @@ output "private_subnet_ids" {
   ]
 }
 
+output "web_subnet_ids" {
+  value = [
+    for k, s in aws_subnet.this : s.id
+    if length(regexall("web", lower(s.tags["Name"]))) > 0
+  ]
+}
+
+output "app_subnet_ids" {
+  value = [
+    for k, s in aws_subnet.this : s.id
+    if length(regexall("app", lower(s.tags["Name"]))) > 0
+  ]
+}
+
+
 output "nat_gateway_ids" {
   value = [for ngw in aws_nat_gateway.this : ngw.id]
 }

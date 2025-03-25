@@ -1,6 +1,6 @@
 module "vpc" {
   source              = "../../modules/vpc"
-  name                = var.name
+  name                = var.vpc_name
   cidr_block          = var.cidr_block
   azs                 = var.azs
   tags                = var.tags
@@ -20,15 +20,11 @@ module "sg" {
 
 module "ec2_bastion" {
   source = "../../modules/ec2"
-
-  ami_id             = "ami-062cddb9d94dcf95d"
-  instance_type      = "t3.micro"
+  ami_id             = var.ami_id
+  instance_type      = var.instance_type
   subnet_id          = module.vpc.public_subnet_ids[0]
   security_group_id  = module.sg.security_group_ids["bastion-sg"]
-  key_name           = "KTB-personal-project-keypair"
-  name               = "bastion"
-  tags               = {
-    Environment = "shared"
-    Project     = "KTB-personal-project"
-  }
+  key_name           = var.key_name
+  ec2_name           = var.ec2_name
+  tags               = var.tags
 }

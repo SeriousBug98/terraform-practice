@@ -1,15 +1,17 @@
-name        = "prod-vpc"
+# 공통
+tags = {
+  Environment = "prod"
+  Project     = "KTB-personal-project"
+}
+
+# VPC
+vpc_name        = "prod-vpc"
 cidr_block  = "10.2.0.0/16"
 azs         = ["ap-northeast-2a", "ap-northeast-2c"]
 
 create_igw        = true
 create_nat_gw     = true
 nat_gateway_count = 2
-
-tags = {
-  Environment = "prod"
-  Project     = "KTB-personal-project"
-}
 
 subnets = [
   { az = "ap-northeast-2a", cidr = "10.2.1.0/24", type = "public" },
@@ -22,6 +24,7 @@ subnets = [
   { az = "ap-northeast-2c", cidr = "10.2.8.0/24", type = "db" }
 ]
 
+# SG
 security_groups = [
   { name = "alb-sg",        description = "Allow HTTP/HTTPS from anywhere" },
   { name = "web-sg",        description = "Allow traffic from ALB" },
@@ -95,3 +98,41 @@ security_group_rules = [
     source_sg_name        = "app-sg"
   }
 ]
+
+## EC2 (이후 단일 인스턴스 생성 시 사용)
+# key_name = "KTB-personal-project-keypair"
+
+# ami_id = "ami-062cddb9d94dcf95d"
+
+# instance_type = "t3.small"
+
+# web_ec2_name = "web"
+
+# app_ec2_name = "app"
+
+# ASG
+ami_id = "ami-062cddb9d94dcf95d"
+
+instance_type = "t3.small"
+
+key_name = "KTB-personal-project-keypair"
+
+desired_capacity = 2
+
+min_size = 1
+
+max_size = 3
+
+web_user_data = <<-EOT
+#!/bin/bash
+yum install -y httpd
+systemctl enable httpd
+systemctl start httpd
+echo "<h1>Web EC2 (Auto Scaling)</h1>" > /var/www/html/index.html
+EOT
+
+app_user_data = <<-EOT
+#!/bin/bash
+yum install -y java-1.8.0-openjdk
+echo "SpringBoot App EC2 (Auto Scaling)" > /home/ec2-user/app.log
+EOT

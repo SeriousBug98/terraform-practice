@@ -23,7 +23,7 @@ variable "key_name" {
   description = "SSH key pair name"
 }
 
-variable "name" {
+variable "ec2_name" {
   type        = string
   description = "Name tag for the instance"
 }

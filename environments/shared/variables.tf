@@ -4,7 +4,7 @@ variable "tags" {
 }
 
 # VPC variables
-variable "name" {
+variable "vpc_name" {
   type = string
 }
 
@@ -37,10 +37,6 @@ variable "subnets" {
 }
 
 # SG variables
-variable "vpc_id" {
-  type = string
-}
-
 variable "security_groups" {
   type = any
 }
@@ -51,5 +47,17 @@ variable "security_group_rules" {
 
 # EC2 variables
 variable "key_name" {
+  type = string
+}
+
+variable "ami_id" {
+  type = string
+}
+
+variable "instance_type" {
+  type = string
+}
+
+variable "ec2_name" {
   type = string
 }
