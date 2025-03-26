@@ -1,30 +1,65 @@
 module "vpc" {
-  source              = "../../modules/vpc"
-  name                = var.vpc_name
-  cidr_block          = var.cidr_block
-  azs                 = var.azs
-  tags                = var.tags
-  create_igw          = var.create_igw
-  create_nat_gw       = var.create_nat_gw
-  nat_gateway_count   = var.nat_gateway_count
-  subnets             = var.subnets
+  source = "../../modules/network/vpc"
+
+  cidr_block = "10.0.0.0/16"
+  name       = "shared-vpc"
 }
 
-module "sg" {
-  source = "../../modules/sg"
+module "subnet" {
+  source = "../../modules/network/subnet"
+
   vpc_id = module.vpc.vpc_id
-  tags = var.tags
-  security_groups = var.security_groups
-  security_group_rules = var.security_group_rules
+  name_prefix = "shared"
+
+  public_subnet_cidrs = {
+    "ap-northeast-2a" = "10.0.1.0/24"
+  }
+
+  web_private_subnet_cidrs = {}
+  app_private_subnet_cidrs = {}
+  db_private_subnet_cidrs = {}
 }
 
-module "ec2_bastion" {
-  source = "../../modules/ec2"
-  ami_id             = var.ami_id
-  instance_type      = var.instance_type
-  subnet_id          = module.vpc.public_subnet_ids[0]
-  security_group_id  = module.sg.security_group_ids["bastion-sg"]
-  key_name           = var.key_name
-  ec2_name           = var.ec2_name
-  tags               = var.tags
+module "route_table" {
+  source = "../../modules/network/route-table"
+
+  vpc_id = module.vpc.vpc_id
+  name_prefix = "shared"
+  internet_gateway_id = module.vpc.internet_gateway_id
+
+  public_subnet_ids = {
+    "ap-northeast-2a" = module.subnet.public_subnets[0]
+  }
+
+  nat_gateway_ids = {}
+  private_subnet_group_az_map = {}
+}
+
+module "bastion_sg" {
+  source = "../../modules/instance/security-group"
+
+  name        = "bastion-sg"
+  description = "Allow SSH from my IP"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress_rules = [
+    {
+      description = "SSH access"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["211.244.225.164/32"]
+    }
+  ]
+}
+
+module "bastion" {
+  source = "../../modules/instance/ec2"
+
+  name               = "bastion"
+  ami_id             = "ami-062cddb9d94dcf95d"
+  instance_type      = "t3.micro"
+  subnet_id          = module.subnet.public_subnets[0]
+  security_group_ids = [module.bastion_sg.security_group_id]
+  key_name           = "KTB-personal-project-keypair"
 }
